@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>广告平台多维对比 · HiSpark Intelligence</title>
+<style>
+:root{
+  --bg:#0b0f1a; --panel:#111827; --panel-2:#0e1526;
+  --line:#1f2a44; --line-soft:#182136;
+  --txt:#eef2f9; --mut:#8b98b3; --mut-2:#5f6b85;
+  --blue:#5b8cff; --cyan:#38d0f0; --green:#2fd6a0; --amber:#ffc14d;
+  --pink:#ff6b9d; --violet:#a78bfa; --rose:#fb7185; --orange:#f59e0b;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh;padding:0 0 48px;letter-spacing:0}
+a{color:inherit}
+canvas#bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+.shell{max-width:1400px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:26px 0 18px;border-bottom:1px solid var(--line);margin-bottom:22px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:14px}
+.mark{width:38px;height:38px;border-radius:11px;background:linear-gradient(145deg,var(--blue),var(--cyan));display:grid;place-items:center;font-weight:800;font-size:17px;color:#07111f;box-shadow:0 6px 20px rgba(56,208,240,.25)}
+.brand h1{font-size:22px;font-weight:800;letter-spacing:0;background:linear-gradient(90deg,#eef2f9,#8fb4ff,#38d0f0,#eef2f9);background-size:220% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:flow 7s linear infinite}
+.brand .sub{font-size:12px;color:var(--mut);margin-top:3px}
+.meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.chip{font-size:12px;color:var(--mut);border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:6px 13px;display:inline-flex;align-items:center;gap:7px}
+.chip .pulse{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(47,214,160,.7)}
+.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.k{position:relative;background:linear-gradient(180deg,var(--panel),var(--panel-2));border:1px solid var(--line);border-radius:14px;padding:16px 18px;overflow:hidden}
+.k:after{content:"";position:absolute;right:-30px;top:-30px;width:110px;height:110px;border-radius:50%;background:radial-gradient(circle,var(--kc),transparent 70%);opacity:.16}
+.k .t{font-size:12px;color:var(--mut)}
+.k .n{font-size:30px;font-weight:800;margin:8px 0 2px;letter-spacing:0}
+.k .n i{font-style:normal;font-size:14px;color:var(--mut);font-weight:500;margin-left:5px}
+.k .f{height:3px;border-radius:3px;background:rgba(255,255,255,.06);overflow:hidden;margin-top:8px}
+.k .f span{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--kc),transparent)}
+.grid{display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin-bottom:14px}
+.grid.rev{grid-template-columns:1fr 1.5fr}
+.card{background:linear-gradient(180deg,var(--panel),var(--panel-2));border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+.card h2{font-size:15px;font-weight:700;display:flex;align-items:center;gap:9px}
+.card h2:before{content:"";width:8px;height:18px;border-radius:3px;background:linear-gradient(180deg,var(--blue),var(--cyan))}
+.card .desc{font-size:12px;color:var(--mut);margin:5px 0 14px}
+.legend{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+.lg{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--txt);background:rgba(255,255,255,.025);border:1px solid var(--line-soft);border-radius:999px;padding:4px 11px;cursor:pointer;transition:all .15s}
+.lg:hover{border-color:var(--line)}
+.lg.off{opacity:.25}
+.dot{width:9px;height:9px;border-radius:50%;flex:none}
+svg{display:block;width:100%;height:auto}
+.axis{font-size:10px;fill:var(--mut-2)}
+.gl{stroke:rgba(255,255,255,.04);stroke-width:1}
+.cellbg{fill:rgba(255,255,255,.018)}
+.dotmarker{cursor:pointer;transition:opacity .12s;transform-box:fill-box;transform-origin:center}
+.dotmarker:hover{stroke:#fff;stroke-width:1.4}
+.dotmarker.dim{opacity:.1}
+.tip{position:fixed;z-index:60;pointer-events:none;background:rgba(13,18,32,.97);border:1px solid rgba(91,140,255,.35);border-radius:11px;padding:10px 13px;font-size:12px;color:var(--txt);box-shadow:0 12px 34px rgba(0,0,0,.55);max-width:270px;display:none;line-height:1.55}
+.tip b{font-size:13px}
+.tip .c{color:var(--mut);font-size:11px}
+.tip .tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.tip .tag{font-size:10px;color:#a9c4ff;background:rgba(91,140,255,.12);border-radius:6px;padding:2px 7px}
+.donut-legend{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.dl{display:flex;align-items:center;justify-content:space-between;font-size:13px}
+.dl .l{display:flex;align-items:center;gap:9px;color:var(--txt)}
+.dl .l i{width:9px;height:9px;border-radius:3px;display:inline-block}
+.dl .v{color:var(--mut);font-weight:600}
+.dl .v b{color:var(--txt);font-weight:700}
+.hm-wrap{overflow:auto;border:1px solid var(--line-soft);border-radius:12px;max-height:480px}
+.hm{width:100%;border-collapse:separate;border-spacing:0;font-size:11px;min-width:560px}
+.hm th,.hm td{padding:7px 9px;text-align:center;border-bottom:1px solid var(--line-soft)}
+.hm thead th{position:sticky;top:0;background:#131b2f;color:var(--mut);font-weight:600;z-index:3}
+.hm tbody tr:hover{background:rgba(91,140,255,.06)}
+.hm tbody tr.dim{opacity:.15}
+.hm td:first-child{text-align:left;position:sticky;left:0;background:#10182b;z-index:2;font-weight:600;white-space:nowrap}
+.hm td:first-child .reg{color:var(--mut-2);font-weight:400;margin-left:6px;font-size:10px}
+.catdot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:baseline}
+.cell{display:inline-block;width:18px;height:18px;border-radius:6px}
+.cell.on{background:linear-gradient(135deg,var(--blue),var(--cyan));box-shadow:0 0 9px rgba(56,208,240,.4)}
+.cell.off{background:rgba(255,255,255,.055)}
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.search{flex:1;min-width:200px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:8px 13px;color:var(--txt);font-size:13px;outline:none}
+.search:focus{border-color:rgba(91,140,255,.5)}
+.select{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;color:var(--txt);font-size:13px;outline:none;cursor:pointer}
+.tbl-wrap{overflow:auto;border:1px solid var(--line-soft);border-radius:12px}
+.tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:820px}
+.tbl th,.tbl td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line-soft);white-space:nowrap}
+.tbl thead th{position:sticky;top:0;background:#131b2f;color:var(--mut);font-weight:600;cursor:pointer;user-select:none;z-index:2}
+.tbl thead th:hover{color:var(--txt)}
+.tbl tbody tr:hover{background:rgba(91,140,255,.05)}
+.tbl .nm{font-weight:600}
+.tbl .sub{color:var(--mut-2);font-size:10px}
+.pill{display:inline-block;font-size:10px;padding:2px 8px;border-radius:999px;border:1px solid var(--line)}
+.pill.d{color:#8ce3ff;border-color:rgba(56,208,240,.3);background:rgba(56,208,240,.08)}
+.pill.s{color:#8ff0c8;border-color:rgba(47,214,160,.3);background:rgba(47,214,160,.08)}
+.pill.b{color:#ffd98a;border-color:rgba(255,193,77,.3);background:rgba(255,193,77,.08)}
+.sizebar{display:inline-flex;align-items:center;gap:2px}
+.sizebar i{width:5px;height:9px;border-radius:1px;background:rgba(255,255,255,.1)}
+.sizebar i.f{background:var(--blue)}
+.tagrow{display:flex;gap:5px;flex-wrap:wrap}
+.tagrow .tag{font-size:10px;color:var(--mut);background:rgba(255,255,255,.04);border-radius:6px;padding:2px 7px;white-space:nowrap}
+.foot{font-size:11px;color:var(--mut-2);text-align:center;padding-top:18px}
+@keyframes flow{to{background-position:220% center}}
+@keyframes pop{0%{transform:scale(0);opacity:0}70%{transform:scale(1.25)}100%{transform:scale(1);opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes light{from{opacity:0;transform:scale(.25)}to{opacity:1;transform:scale(1)}}
+@keyframes scaleIn{from{transform:scale(0)}to{transform:scale(1)}}
+@keyframes breathe{0%,100%{box-shadow:0 0 8px rgba(56,208,240,.25)}50%{box-shadow:0 0 18px rgba(56,208,240,.55)}}
+.anim-pop{animation:pop .5s cubic-bezier(.2,.8,.3,1.25) both}
+.anim-fade{animation:fadeUp .55s ease both}
+.cell.on{animation:light .4s ease both}
+.k:after{animation:breathe 4s ease-in-out infinite}
+@media(max-width:960px){.grid,.grid.rev{grid-template-columns:1fr}.kpi{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.kpi{grid-template-columns:1fr}.shell{padding:0 14px}.top{padding-top:18px}}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+<div class="shell">
+  <header class="top">
+    <div class="brand">
+      <div class="mark">H</div>
+      <div>
+        <h1>广告平台多维对比</h1>
+        <div class="sub">49 家监测平台的业务侧重 · 类别 · 地域 · 能力矩阵</div>
+      </div>
+    </div>
+    <div class="meta">
+      <a class="chip" href="index.html" style="text-decoration:none;color:var(--txt)">← 返回情报站</a>
+      <span class="chip"><span class="pulse"></span>数据更新 2026-10-24</span>
+      <span class="chip">广告聚合 / 变现观察</span>
+    </div>
+  </header>
+
+  <section class="kpi" id="kpi"></section>
+
+  <section class="grid">
+    <div class="card">
+      <h2>业务侧重 × 平台类别</h2>
+      <div class="desc">纵轴为业务侧重，横轴为平台类别；圆点大小代表体量，悬停查看详情</div>
+      <div class="legend" id="lg"></div>
+      <div id="matrix"></div>
+    </div>
+    <div class="card">
+      <h2>总部地域分布</h2>
+      <div class="desc">中国 · 美国/北美 · 其他地区</div>
+      <div id="donut"></div>
+    </div>
+  </section>
+
+  <section class="grid rev">
+    <div class="card">
+      <h2>平台类别构成</h2>
+      <div class="desc">按商业模式与角色聚类，共 8 类</div>
+      <div id="bars"></div>
+    </div>
+    <div class="card">
+      <h2>能力矩阵</h2>
+      <div class="desc">49 平台 × 6 项核心能力，亮格代表具备该能力</div>
+      <div class="hm-wrap"><table class="hm" id="heat"></table></div>
+    </div>
+  </section>
+
+  <section class="card" style="margin-top:14px">
+    <h2>平台总览</h2>
+    <div class="desc">搜索、按类别筛选，点击表头可排序</div>
+    <div class="toolbar">
+      <input class="search" id="q" placeholder="搜索平台名称…">
+      <select class="select" id="catSel"></select>
+      <select class="select" id="sortSel">
+        <option value="size">按体量</option>
+        <option value="name">按名称</option>
+      </select>
+    </div>
+    <div class="tbl-wrap"><table class="tbl" id="tbl"></table></div>
+  </section>
+  <div class="foot">分类、侧重与能力标注为编辑侧整理，用于行业对比观察；体量为相对量级估计。</div>
+</div>
+<div class="tip" id="tip"></div>
+
+<script>
+const CAT = {
+  mobile:["移动网盟/变现","#5b8cff","移动网盟"],
+  dsp:["程序化 DSP","#38d0f0","DSP"],
+  social:["社交广告","#ff6b9d","社交"],
+  ssp:["SSP / 交易","#2fd6a0","SSP"],
+  commerce:["零售/电商媒体","#ffc14d","电商"],
+  growth:["归因/增长","#a78bfa","归因"],
+  search:["搜索/应用商店","#fb7185","搜索商店"],
+  content:["原生/内容/音频","#f59e0b","原生内容"]
+};
+// n, cat, region, focus(D/S/B), size(1-5), [app,ctv,audio,native,commerce,b2b]
+const P = [
+["AdMob","mobile","US","S",5,[1,0,0,0,0,0]],
+["AppLovin","mobile","US","B",5,[1,1,0,0,0,0]],
+["Unity Ads","mobile","US","S",4,[1,0,0,0,0,0]],
+["Pangle","mobile","CN","S",4,[1,0,0,1,0,0]],
+["AdSense","search","US","S",5,[0,0,0,0,0,0]],
+["TopOn","mobile","CN","S",3,[1,0,0,0,0,0]],
+["Yandex","search","OTH","B",4,[1,0,0,0,0,0]],
+["Meta Aud","social","US","B",5,[1,0,0,1,0,0]],
+["Amazon","commerce","US","B",5,[1,1,1,0,1,0]],
+["Bigo","mobile","CN","S",3,[1,0,0,0,0,0]],
+["Taboola","content","US","S",4,[0,0,0,1,0,0]],
+["App Store","search","US","D",5,[0,0,0,0,0,0]],
+["Google Play","search","US","D",5,[0,0,0,0,0,0]],
+["TapTap","search","CN","D",2,[0,0,0,0,0,0]],
+["Moloco","dsp","US","D",4,[1,0,0,0,0,0]],
+["Huawei","mobile","CN","S",4,[1,0,0,0,0,0]],
+["Oppo","mobile","CN","S",4,[1,0,0,0,0,0]],
+["Tencent","mobile","CN","B",5,[1,0,0,0,0,0]],
+["Kwai","mobile","CN","S",4,[1,0,0,1,0,0]],
+["Mintegral","mobile","CN","B",4,[1,0,0,1,0,0]],
+["Xiaomi","mobile","CN","S",4,[1,0,0,0,0,0]],
+["Chartboost","mobile","US","S",3,[1,0,0,0,0,0]],
+["Vungle","mobile","US","S",4,[1,0,0,0,0,0]],
+["AdColony","mobile","US","S",3,[1,0,0,0,0,0]],
+["InMobi","mobile","OTH","S",3,[1,0,0,0,0,0]],
+["Fyber","mobile","US","S",3,[1,0,0,0,0,0]],
+["IronSource","mobile","OTH","S",4,[1,0,0,0,0,0]],
+["Liftoff","dsp","OTH","D",4,[1,0,0,0,0,0]],
+["Adjust","growth","OTH","D",4,[1,0,0,0,0,0]],
+["AppsFlyer","growth","OTH","D",4,[1,0,0,0,0,0]],
+["StartApp","mobile","US","S",2,[1,0,0,0,0,0]],
+["VIVO Ads","mobile","CN","S",3,[1,0,0,0,0,0]],
+["Reddit","social","US","D",4,[1,0,0,1,0,0]],
+["Snapchat Ads","social","US","D",4,[1,0,0,0,0,0]],
+["Pinterest Ads","social","US","D",4,[1,0,0,1,1,0]],
+["X Ads","social","US","D",4,[1,0,0,0,0,0]],
+["LinkedIn Ads","social","US","D",4,[1,0,0,0,0,1]],
+["Spotify Ads","content","OTH","B",4,[1,0,1,0,0,0]],
+["The Trade Desk","dsp","US","D",5,[0,1,0,0,0,0]],
+["Criteo","commerce","OTH","D",4,[0,0,0,1,1,0]],
+["Outbrain","content","US","S",3,[0,0,0,1,0,0]],
+["Magnite","ssp","US","S",5,[0,1,0,0,0,0]],
+["PubMatic","ssp","US","S",4,[1,1,0,0,0,0]],
+["Google Ad Manager","ssp","US","S",5,[1,1,0,0,0,0]],
+["Display & Video 360","dsp","US","D",5,[0,1,0,0,0,0]],
+["Yahoo Ads","dsp","US","B",4,[1,1,0,1,0,0]],
+["Digital Turbine","mobile","US","B",3,[1,0,0,0,0,0]],
+["Index Exchange","ssp","US","S",4,[0,1,0,0,0,0]],
+["OpenX","ssp","US","S",4,[0,1,0,0,0,0]]
+];
+const REG = {CN:"中国",US:"美国/北美",OTH:"其他地区"};
+const ROW = {S:"供应侧",B:"双端",D:"需求侧"};
+const DIMS = ["App变现","CTV/OTT","音频","原生/内容","电商媒体","B2B"];
+const DIMS_SHORT = ["App","CTV","音频","原生","电商","B2B"];
+const $=id=>document.getElementById(id);
+let activeCat=null;
+
+// KPI
+function kpi(){
+  const nD=P.filter(p=>p[3]==="D").length, nS=P.filter(p=>p[3]==="S").length, nB=P.filter(p=>p[3]==="B").length;
+  const catN=Object.keys(CAT).length;
+  const cards=[
+    {label:"监测平台",num:true,v:P.length,unit:"家",c:"#38d0f0",w:100},
+    {label:"平台类别",num:true,v:catN,unit:"类",c:"#5b8cff",w:100},
+    {label:"需求 / 供应 / 双端",num:false,txt:`${nD} / ${nS} / ${nB}`,unit:"",c:"#2fd6a0",w:Math.round(nD/(nD+nS+nB)*100)},
+    {label:"总部地域",num:true,v:Object.keys(REG).length,unit:"区域",c:"#ffc14d",w:100}
+  ];
+  $("kpi").innerHTML=cards.map(x=>`<div class="k anim-fade" style="--kc:${x.c}"><div class="t">${x.label}</div><div class="n">${x.num?`<span class="num" data-v="${x.v}">0</span><i>${x.unit}</i>`:x.txt}</div><div class="f"><span style="width:${x.w}%;background:${x.c}"></span></div></div>`).join("");
+  requestAnimationFrame(()=>document.querySelectorAll("#kpi .num").forEach(el=>animateCount(el,+el.dataset.v)));
+}
+
+function animateCount(el,target,dur=1100){
+  const t0=performance.now();
+  function step(t){
+    const k=Math.min(1,(t-t0)/dur);
+    const e=1-Math.pow(1-k,3);
+    el.textContent=Math.round(target*e);
+    if(k<1)requestAnimationFrame(step);else el.textContent=target;
+  }
+  requestAnimationFrame(step);
+}
+
+// legend
+const lg=$("lg");
+lg.innerHTML=Object.entries(CAT).map(([k,v])=>`<span class="lg" data-c="${k}"><span class="dot" style="background:${v[1]}"></span>${v[0]}</span>`).join("");
+lg.addEventListener("click",e=>{
+  const el=e.target.closest(".lg");if(!el)return;
+  const c=el.dataset.c; activeCat = activeCat===c?null:c;
+  document.querySelectorAll(".lg").forEach(x=>x.classList.toggle("off",activeCat&&x.dataset.c!==activeCat));
+  drawMatrix();drawHeat();drawTable();
+});
+
+// matrix: category (x) x focus (y) swarm dots
+function drawMatrix(){
+  const W=760,H=340,pl=58,pr=10,pt=18,pb=64;
+  const cats=Object.keys(CAT), rows=["S","B","D"];
+  const cw=(W-pl-pr)/cats.length, rh=(H-pt-pb)/rows.length;
+  const X=i=>pl+i*cw+cw/2, Y=j=>pt+j*rh+rh/2;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+  // cell backgrounds
+  rows.forEach((r,ri)=>cats.forEach((c,ci)=>{
+    s+=`<rect class="cellbg" x="${pl+ci*cw}" y="${pt+ri*rh}" width="${cw}" height="${rh}" rx="6"/>`;
+  }));
+  // axes
+  s+=`<line class="gl" x1="${pl}" y1="${pt}" x2="${pl}" y2="${H-pb}"/>`;
+  s+=`<line class="gl" x1="${pl}" y1="${H-pb}" x2="${W-pr}" y2="${H-pb}"/>`;
+  rows.forEach((r,ri)=>s+=`<text class="axis" x="${pl-10}" y="${Y(ri)+3}" text-anchor="end">${ROW[r]}</text>`);
+  cats.forEach((c,ci)=>{
+    s+=`<text class="axis" x="${X(ci)}" y="${H-40}" text-anchor="middle" transform="rotate(-28 ${X(ci)} ${H-40})">${CAT[c][2]}</text>`;
+  });
+  // swarm per cell
+  rows.forEach((r,ri)=>cats.forEach((c,ci)=>{
+    const pts=P.map((p,i)=>({p,i})).filter(o=>o.p[1]===c&&o.p[3]===r).sort((a,b)=>b.p[4]-a.p[4]);
+    const cx=X(ci), cy=Y(ri);
+    const availW=cw-8, availH=rh-8;
+    let placed=[];
+    pts.forEach(o=>{
+      const rad=3+o.p[4]*1.15;
+      const step=rad*2+1;
+      for(let row=0;;row++){
+        const maxPer=Math.max(1,Math.floor(availW/step));
+        const col=placed.length - row*maxPer;
+        if(col<maxPer){
+          const nInRow=Math.min(pts.length-row*maxPer,maxPer);
+          const startX=cx-(nInRow-1)*step/2;
+          placed.push([startX+col*step, cy+(row-(Math.ceil(pts.length/maxPer)-1)/2)*step]);
+          break;
+        }
+        if(row>10){placed.push([cx,cy]);break;}
+      }
+    });
+    placed.forEach((pos,idx)=>{
+      const o=pts[idx];const rad=3+o.p[4]*1.15;
+      const dim=activeCat&&o.p[1]!==activeCat?" dim":"";
+      s+=`<circle class="dotmarker${dim}" cx="${pos[0]}" cy="${pos[1]}" r="${rad}" fill="${CAT[c][1]}" fill-opacity=".88" data-i="${o.i}" style="animation:scaleIn .45s cubic-bezier(.2,.8,.3,1.3) both;animation-delay:${idx*10}ms"/>`;
+    });
+  }));
+  s+=`</svg>`;
+  $("matrix").innerHTML=s;
+  $("matrix").querySelectorAll(".dotmarker").forEach(d=>{
+    d.addEventListener("mousemove",e=>showTip(P[+d.dataset.i],e));
+    d.addEventListener("mouseleave",hideTip);
+  });
+}
+
+// donut
+function drawDonut(){
+  const reg={CN:0,US:0,OTH:0};P.forEach(p=>reg[p[2]]++);
+  const rc={CN:"#5b8cff",US:"#38d0f0",OTH:"#2fd6a0"};
+  const total=P.length;let acc=0,segs="";
+  Object.keys(REG).forEach(k=>{
+    const v=reg[k];const a0=acc/total*Math.PI*2;acc+=v;const a1=acc/total*Math.PI*2;
+    const large=a1-a0>Math.PI?1:0;
+    const x0=120+Math.cos(a0-Math.PI/2)*88,y0=120+Math.sin(a0-Math.PI/2)*88;
+    const x1=120+Math.cos(a1-Math.PI/2)*88,y1=120+Math.sin(a1-Math.PI/2)*88;
+    segs+=`<path d="M120 120 L${x0} ${y0} A88 88 0 ${large} 1 ${x1} ${y1} Z" fill="${rc[k]}" fill-opacity=".92"/>`;
+  });
+  $("donut").innerHTML=`<svg class="anim-pop" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" style="animation-delay:.1s">${segs}<circle cx="120" cy="120" r="52" fill="#0e1526"/><text x="120" y="118" text-anchor="middle" font-size="32" font-weight="800" fill="#eef2f9">${total}</text><text x="120" y="140" text-anchor="middle" font-size="11" fill="#8b98b3">平台总数</text></svg><div class="donut-legend">${Object.keys(REG).map(k=>`<div class="dl"><span class="l"><i style="background:${rc[k]}"></i>${REG[k]}</span><span class="v"><b>${reg[k]}</b> · ${Math.round(reg[k]/total*100)}%</span></div>`).join("")}</div>`;
+}
+
+// bars (category count)
+function drawBars(){
+  const cats=Object.keys(CAT).map(k=>({k,n:P.filter(p=>p[1]===k).length}));
+  const max=Math.max(...cats.map(c=>c.n));
+  $("bars").innerHTML=cats.map((c,i)=>`
+    <div class="dl anim-fade" style="margin-bottom:12px;animation-delay:${i*60}ms">
+      <span class="l" style="width:104px;gap:8px"><i style="background:${CAT[c.k][1]}"></i>${CAT[c.k][0]}</span>
+      <div class="bar" style="flex:1;height:9px;background:rgba(255,255,255,.05);border-radius:5px;overflow:hidden"><div data-w="${Math.round(c.n/max*100)}" style="width:0;height:100%;background:${CAT[c.k][1]};border-radius:5px;transition:width 1s cubic-bezier(.2,.8,.2,1)"></div></div>
+      <span class="v" style="width:26px;text-align:right"><b>${c.n}</b></span>
+    </div>`).join("");
+  // reattach layout class
+  $("bars").querySelectorAll(".dl").forEach(d=>{d.style.display="flex";d.style.alignItems="center";d.style.gap="10px";});
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    $("bars").querySelectorAll(".bar div[data-w]").forEach(b=>b.style.width=b.dataset.w+"%");
+  }));
+}
+
+// heatmap
+function drawHeat(){
+  let h=`<thead><tr><th style="text-align:left;min-width:150px">平台</th>${DIMS_SHORT.map(d=>`<th>${d}</th>`).join("")}</tr></thead><tbody>`;
+  P.forEach((p,i)=>{
+    const dim=activeCat&&p[1]!==activeCat;
+    const tds=p[5].map((v,ci)=>`<td><span class="cell ${v?"on":"off"}" ${v?`style="animation-delay:${i*16+ci*45}ms"`:""}></span></td>`).join("");
+    h+=`<tr data-i="${i}" class="${dim?"dim":""}"><td><span class="catdot" style="background:${CAT[p[1]][1]}"></span>${p[0]}<span class="reg">${REG[p[2]]}</span></td>${tds}</tr>`;
+  });
+  h+=`</tbody>`;
+  $("heat").innerHTML=h;
+  $("heat").querySelectorAll("tr[data-i]").forEach(tr=>{
+    tr.addEventListener("mousemove",e=>showTip(P[+tr.dataset.i],e));
+    tr.addEventListener("mouseleave",hideTip);
+  });
+}
+
+// table
+let sortKey="size", sortDir=-1;
+const catSel=$("catSel");
+catSel.innerHTML='<option value="">全部类别</option>'+Object.entries(CAT).map(([k,v])=>`<option value="${k}">${v[0]}</option>`).join("");
+catSel.addEventListener("change",drawTable);
+$("q").addEventListener("input",drawTable);
+$("sortSel").addEventListener("change",e=>{sortKey=e.target.value;sortDir=-1;drawTable();});
+
+function drawTable(){
+  const q=$("q").value.trim().toLowerCase();
+  const c=catSel.value;
+  let rows=P.map((p,i)=>({p,i})).filter(o=>(!c||o.p[1]===c)&&(!q||o.p[0].toLowerCase().includes(q)));
+  rows.sort((a,b)=>{
+    if(sortKey==="size") return (b.p[4]-a.p[4])*sortDir || a.p[0].localeCompare(b.p[0]);
+    return a.p[0].localeCompare(b.p[0])* -sortDir;
+  });
+  let h=`<thead><tr><th data-k="name">平台</th><th data-k="size">类别</th><th>地域</th><th>侧重</th><th data-k="size">体量</th><th>能力</th></tr></thead><tbody>`;
+  h+=rows.map(o=>{
+    const p=o.p;
+    const focus=p[3]==="D"?'<span class="pill d">需求侧</span>':(p[3]==="S"?'<span class="pill s">供应侧</span>':'<span class="pill b">双端</span>');
+    const tags=DIMS.filter((d,i)=>p[5][i]).map((d,i)=>DIMS_SHORT[i]).map(t=>`<span class="tag">${t}</span>`).join("");
+    const sb=Array.from({length:5},(_,k)=>k<p[4]?'<i class="f"></i>':'<i></i>').join("");
+    return `<tr data-i="${o.i}" class="anim-fade" style="animation-delay:${Math.min(400,o.i*8)}ms"><td class="nm">${p[0]}<div class="sub">${CAT[p[1]][0]}</div></td><td><span class="catdot" style="background:${CAT[p[1]][1]}"></span>${CAT[p[1]][0]}</td><td>${REG[p[2]]}</td><td>${focus}</td><td><span class="sizebar">${sb}</span></td><td><div class="tagrow">${tags||'<span class="sub">—</span>'}</div></td></tr>`;
+  }).join("");
+  h+=`</tbody>`;
+  $("tbl").innerHTML=h;
+  $("tbl").querySelectorAll("thead th[data-k]").forEach(th=>{
+    th.addEventListener("click",()=>{
+      const k=th.dataset.k;
+      if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=-1;}
+      drawTable();
+    });
+  });
+  $("tbl").querySelectorAll("tbody tr").forEach(tr=>{
+    tr.addEventListener("mousemove",e=>showTip(P[+tr.dataset.i],e));
+    tr.addEventListener("mouseleave",hideTip);
+  });
+}
+
+function showTip(p,e){
+  const t=$("tip");
+  const tags=DIMS.filter((d,i)=>p[5][i]).map((d,i)=>DIMS_SHORT[i]);
+  t.innerHTML=`<b>${p[0]}</b><br><span class="c">${CAT[p[1]][0]} · ${REG[p[2]]} · ${ROW[p[3]]} · 体量 ${p[4]}/5</span><div class="tags">${tags.map(x=>`<span class="tag">${x}</span>`).join("")||'<span class="tag">展示/搜索</span>'}</div>`;
+  t.style.display="block";
+  const x=Math.min(e.clientX+14,innerWidth-280);
+  const y=Math.min(e.clientY+16,innerHeight-120);
+  t.style.left=x+"px";t.style.top=y+"px";
+}
+function hideTip(){$("tip").style.display="none";}
+
+// animated particle background
+function bg(){
+  const c=document.getElementById("bg");if(!c)return;
+  const ctx=c.getContext("2d");let w,h,ps=[];
+  function rs(){w=c.width=innerWidth;h=c.height=innerHeight;}
+  rs();window.addEventListener("resize",rs);
+  const N=Math.min(90,Math.max(30,Math.floor(w*h/17000)));
+  ps=Array.from({length:N},()=>({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35}));
+  function frame(){
+    ctx.clearRect(0,0,w,h);
+    for(const p of ps){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>w)p.vx*=-1;if(p.y<0||p.y>h)p.vy*=-1;}
+    for(let i=0;i<ps.length;i++)for(let j=i+1;j<ps.length;j++){
+      const a=ps[i],b=ps[j],dx=a.x-b.x,dy=a.y-b.y,d=dx*dx+dy*dy;
+      if(d<12000){ctx.strokeStyle=`rgba(91,140,255,${(1-d/12000)*.16})`;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}
+    }
+    for(const p of ps){ctx.fillStyle="rgba(56,208,240,.5)";ctx.beginPath();ctx.arc(p.x,p.y,1.3,0,6.283);ctx.fill();}
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+bg();kpi();drawMatrix();drawDonut();drawBars();drawHeat();drawTable();
+</script>
+</body>
+</html>
